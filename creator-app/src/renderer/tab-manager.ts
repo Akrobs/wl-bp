@@ -165,7 +165,7 @@ export class RendererTabManager {
   getTabLabel(tab: RendererTab): string {
     if (tab.name) return tab.name;
     if (tab.url) {
-      if (tab.url.includes('vk.com')) return 'VK (legacy)';
+      if (tab.url.includes('vk.ru')) return 'VK (legacy)';
       if (tab.url.includes('telemost')) return 'Telemost (legacy)';
       if (tab.url.includes('dion.vc')) return 'DION';
     }

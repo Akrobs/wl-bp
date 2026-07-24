@@ -79,7 +79,7 @@ export function renderContent(tm: RendererTabManager): void {
         targetInput.placeholder = 'https://telemost.yandex.ru/j/...';
       } else {
         targetLabel.textContent = 'Paste a VK call link.';
-        targetInput.placeholder = 'https://vk.com/call/join/...';
+        targetInput.placeholder = 'https://vk.ru/call/join/...';
       }
     } else {
       startEl.classList.remove('visible');
@@ -116,7 +116,7 @@ export function renderContent(tm: RendererTabManager): void {
   } else {
     toolbar.style.display = 'flex';
     headlessInfo.style.display = 'none';
-    const isVK = activeTab.platform === Platform.VK && activeTab.url.includes('vk.com');
+    const isVK = activeTab.platform === Platform.VK && activeTab.url.includes('vk.ru');
     const modeSelect = document.getElementById('modeSelect') as HTMLSelectElement;
     const tunnelLabel = document.getElementById('tunnelLabel') as HTMLElement;
     modeSelect.style.display = isVK ? '' : 'none';
@@ -172,7 +172,7 @@ export function loadURL(tm: RendererTabManager, url: string): void {
   if (url.includes('telemost.yandex')) {
     activeTab.platform = Platform.Telemost;
     activeTab.mode = TunnelMode.PionVideo;
-  } else if (url.includes('vk.com')) {
+  } else if (url.includes('vk.ru')) {
     activeTab.platform = Platform.VK;
   }
   window.bridge.setTunnelMode(tm.activeTabId, activeTab.mode, activeTab.platform);

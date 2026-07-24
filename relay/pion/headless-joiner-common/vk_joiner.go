@@ -138,7 +138,7 @@ func (h *VKHeadlessJoiner) RunWithParams(jsonParams string) {
 	h.obf = obf
 	h.vp8FPS = params.VP8FPS
 	h.vp8Batch = params.VP8Batch
-	h.dualTrack = params.DualTrack
+	// h.dualTrack = params.DualTrack // temporarily disabled for VK joiners
 	h.logFn("headless: auth params received")
 	h.logFn("headless: obf key-source=%q localEpoch=0x%08x", params.JoinLink, obf.LocalEpoch())
 	h.logFn("headless:   appVersion=%s protocolVersion=%s vp8Fps=%d vp8Batch=%d",

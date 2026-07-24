@@ -103,8 +103,8 @@ func httpPost(endpoint string, form url.Values, extraHeaders map[string]string) 
 	}
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	req.Header.Set("User-Agent", common.UserAgent)
-	req.Header.Set("Origin", "https://vk.com")
-	req.Header.Set("Referer", "https://vk.com/")
+	req.Header.Set("Origin", "https://vk.ru")
+	req.Header.Set("Referer", "https://vk.ru/")
 	for k, v := range extraHeaders {
 		req.Header.Set(k, v)
 	}
@@ -138,7 +138,7 @@ func authAndJoin(cookieStr, okJoinLink string, cfg VKConfig) (*JoinResponse, err
 		return map[string]string{"Authorization": "Bearer " + bearer}
 	}
 
-	r, err := httpPost("https://login.vk.com/?act=web_token",
+	r, err := httpPost("https://login.vk.ru/?act=web_token",
 		url.Values{"version": {"1"}, "app_id": {cfg.AppID}},
 		map[string]string{"Cookie": cookieStr})
 	if err != nil {
@@ -150,7 +150,7 @@ func authAndJoin(cookieStr, okJoinLink string, cfg VKConfig) (*JoinResponse, err
 		return nil, fmt.Errorf("empty VK token, response: %s", string(r))
 	}
 
-	r, err = httpPost("https://api.vk.com/method/calls.getSettings",
+	r, err = httpPost("https://api.vk.ru/method/calls.getSettings",
 		url.Values{"v": {cfg.APIVersion}}, auth(tok.Data.AccessToken))
 	if err != nil {
 		return nil, fmt.Errorf("calls.getSettings: %w", err)
@@ -162,7 +162,7 @@ func authAndJoin(cookieStr, okJoinLink string, cfg VKConfig) (*JoinResponse, err
 		return nil, fmt.Errorf("empty public_key, response: %s", string(r))
 	}
 
-	r, err = httpPost("https://api.vk.com/method/messages.getCallToken",
+	r, err = httpPost("https://api.vk.ru/method/messages.getCallToken",
 		url.Values{"v": {cfg.APIVersion}, "env": {"production"}}, auth(tok.Data.AccessToken))
 	if err != nil {
 		return nil, fmt.Errorf("messages.getCallToken: %w", err)
@@ -268,7 +268,7 @@ func createAndJoinCall(cookieStr, peerId string, cfg VKConfig) (*CallInfo, error
 	}
 
 	log.Println("[auth] Getting VK token...")
-	r, err := httpPost("https://login.vk.com/?act=web_token",
+	r, err := httpPost("https://login.vk.ru/?act=web_token",
 		url.Values{"version": {"1"}, "app_id": {cfg.AppID}},
 		map[string]string{"Cookie": cookieStr})
 	if err != nil {
@@ -282,7 +282,7 @@ func createAndJoinCall(cookieStr, peerId string, cfg VKConfig) (*CallInfo, error
 	}
 
 	log.Printf("[auth] Creating call peer_id=%s...", peerId)
-	r, err = httpPost("https://api.vk.com/method/calls.start",
+	r, err = httpPost("https://api.vk.ru/method/calls.start",
 		url.Values{"v": {cfg.APIVersion}, "peer_id": {peerId}}, auth(vkToken))
 	if err != nil {
 		return nil, fmt.Errorf("calls.start: %w", err)

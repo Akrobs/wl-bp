@@ -51,8 +51,8 @@ func RunVKAuth(joinLink string, displayName string, logFn func(string, ...any), 
 		req, _ := http.NewRequest("POST", targetURL, strings.NewReader(form.Encode()))
 		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 		req.Header.Set("User-Agent", common.UserAgent)
-		req.Header.Set("Origin", "https://vk.com")
-		req.Header.Set("Referer", "https://vk.com/")
+		req.Header.Set("Origin", "https://vk.ru")
+		req.Header.Set("Referer", "https://vk.ru/")
 		for k, v := range extraHeaders {
 			req.Header.Set(k, v)
 		}
@@ -84,7 +84,7 @@ func RunVKAuth(joinLink string, displayName string, logFn func(string, ...any), 
 	statusFn("Getting anonymous token...")
 	logFn("vk-auth: getting anon token")
 
-	anonResp, err := httpPost("https://login.vk.com/?act=get_anonym_token", url.Values{
+	anonResp, err := httpPost("https://login.vk.ru/?act=get_anonym_token", url.Values{
 		"client_id": {cfg.AppID},
 	}, nil)
 	if err != nil {
@@ -102,7 +102,7 @@ func RunVKAuth(joinLink string, displayName string, logFn func(string, ...any), 
 	statusFn("Getting call settings...")
 	logFn("vk-auth: getting call settings")
 
-	settingsResp, err := httpPost("https://api.vk.com/method/calls.getSettings", url.Values{
+	settingsResp, err := httpPost("https://api.vk.ru/method/calls.getSettings", url.Values{
 		"v": {cfg.ApiVersion},
 	}, auth)
 	if err != nil {
@@ -121,7 +121,7 @@ func RunVKAuth(joinLink string, displayName string, logFn func(string, ...any), 
 	statusFn("Getting call preview...")
 	logFn("vk-auth: getting call preview")
 
-	previewResp, err := httpPost("https://api.vk.com/method/calls.getCallPreview", url.Values{
+	previewResp, err := httpPost("https://api.vk.ru/method/calls.getCallPreview", url.Values{
 		"v":            {cfg.ApiVersion},
 		"vk_join_link": {joinLink},
 	}, auth)
@@ -149,7 +149,7 @@ func RunVKAuth(joinLink string, displayName string, logFn func(string, ...any), 
 	var okJoinLink string
 
 	for attempt := 0; attempt < 5; attempt++ {
-		callResp, err := httpPost("https://api.vk.com/method/calls.getAnonymousToken", callParams, auth)
+		callResp, err := httpPost("https://api.vk.ru/method/calls.getAnonymousToken", callParams, auth)
 		if err != nil {
 			return "", fmt.Errorf("getAnonymousToken: %w", err)
 		}

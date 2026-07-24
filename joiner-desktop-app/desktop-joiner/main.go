@@ -330,7 +330,7 @@ func signalingHosts(platform, link string) []string {
 		}
 		return hosts
 	case "vk":
-		hosts := []string{"vk.com", "login.vk.com", "api.vk.com", "ok.ru", "cloud-api.yandex.ru"}
+		hosts := []string{"vk.ru", "login.vk.ru", "api.vk.ru", "ok.ru", "cloud-api.yandex.ru"}
 		if u, err := url.Parse(strings.TrimSpace(link)); err == nil && u.Host != "" {
 			hosts = append(hosts, u.Host)
 		}
