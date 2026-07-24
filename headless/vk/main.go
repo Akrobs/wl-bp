@@ -306,7 +306,6 @@ func createAndJoinCall(cookieStr, peerId string, cfg VKConfig) (*CallInfo, error
 		return nil, fmt.Errorf("empty ok_join_link, response: %s", string(r))
 	}
 	log.Printf("[auth] call_id: %s", c.CallID)
-	log.Printf("[auth] join_link: %s", c.JoinLink)
 
 	log.Println("[auth] Joining conversation...")
 	joinResp, err := authAndJoin(cookieStr, c.OKJoinLink, cfg)

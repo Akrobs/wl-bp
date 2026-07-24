@@ -129,7 +129,6 @@ func RunVKAuth(joinLink string, displayName string, logFn func(string, ...any), 
 		if respObj, ok := previewResp["response"].(map[string]interface{}); ok {
 			if okLink, ok := respObj["ok_join_link"].(string); ok {
 				cfg.OkJoinLink = okLink
-				logFn("vk-auth: okJoinLink=%s", okLink)
 			}
 		}
 	}
