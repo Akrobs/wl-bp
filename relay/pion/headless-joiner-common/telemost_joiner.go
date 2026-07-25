@@ -214,9 +214,7 @@ func (j *TelemostHeadlessJoiner) Close() {
 	ws := j.ws
 	j.ws = nil
 	j.wsMu.Unlock()
-	if ws != nil {
-		ws.Close()
-	}
+	common.CloseWS(ws)
 	if j.vp8tunnel != nil {
 		j.vp8tunnel.Stop()
 	}
@@ -585,9 +583,7 @@ func (j *TelemostHeadlessJoiner) forceReconnect(reason string) {
 	j.wsMu.Lock()
 	ws := j.ws
 	j.wsMu.Unlock()
-	if ws != nil {
-		ws.Close()
-	}
+	common.CloseWS(ws)
 }
 
 func (j *TelemostHeadlessJoiner) sendStartupSlotsRamp() {

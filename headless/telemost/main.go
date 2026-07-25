@@ -273,9 +273,7 @@ func (b *Bridge) forceReconnect(reason string) {
 	b.mu.Lock()
 	ws := b.ws
 	b.mu.Unlock()
-	if ws != nil {
-		ws.Close()
-	}
+	common.CloseWS(ws)
 }
 
 func (b *Bridge) sendInitBundle() {

@@ -191,9 +191,7 @@ func (c *Client) Close() {
 	c.wsMu.Lock()
 	ws := c.ws
 	c.wsMu.Unlock()
-	if ws != nil {
-		_ = ws.Close()
-	}
+	common.CloseWS(ws)
 	if c.pubPC != nil {
 		_ = c.pubPC.Close()
 	}

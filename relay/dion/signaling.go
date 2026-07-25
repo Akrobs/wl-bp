@@ -283,7 +283,8 @@ func (c *SignalingClient) Close() error {
 	if !c.closed.CompareAndSwap(false, true) {
 		return nil
 	}
-	return c.conn.Close()
+	common.CloseWS(c.conn)
+	return nil
 }
 
 func (c *SignalingClient) sendFrame(method string, params any) error {
