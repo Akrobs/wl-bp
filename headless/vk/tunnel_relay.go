@@ -106,14 +106,18 @@ func (u *TunnelRelay) Init(iceServers []webrtc.ICEServer) error {
 	if err == nil {
 		dcNotif.OnOpen(func() { log.Println("[relay] producerNotification DC opened") })
 		dcNotif.OnMessage(func(msg webrtc.DataChannelMessage) {
-			log.Printf("[relay] producerNotification msg len=%d", len(msg.Data))
+			if common.Debug {
+				log.Printf("[relay] producerNotification msg len=%d", len(msg.Data))
+			}
 		})
 	}
 	dcCmd, err := pc.CreateDataChannel("producerCommand", &webrtc.DataChannelInit{Ordered: &ordered})
 	if err == nil {
 		dcCmd.OnOpen(func() { log.Println("[relay] producerCommand DC opened") })
 		dcCmd.OnMessage(func(msg webrtc.DataChannelMessage) {
-			log.Printf("[relay] producerCommand msg len=%d", len(msg.Data))
+			if common.Debug {
+				log.Printf("[relay] producerCommand msg len=%d", len(msg.Data))
+			}
 		})
 	}
 	producerScreen, psErr := pc.CreateDataChannel("producerScreenShare", &webrtc.DataChannelInit{Ordered: &ordered})
@@ -459,7 +463,7 @@ func (u *TunnelRelay) readTrack(track *webrtc.TrackRemote) {
 			continue
 		}
 		recvCount++
-		if recvCount <= 3 || recvCount%200 == 0 {
+		if common.Debug && (recvCount <= 3 || recvCount%200 == 0) {
 			log.Printf("[video] recv vp8 frame #%d %d bytes", recvCount, len(frameBuf))
 		}
 

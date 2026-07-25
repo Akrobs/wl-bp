@@ -271,7 +271,7 @@ func (r *SFURelay) readTrack(track *webrtc.TrackRemote) {
 			continue
 		}
 		recvCount++
-		if recvCount <= 3 || recvCount%200 == 0 {
+		if common.Debug && (recvCount <= 3 || recvCount%200 == 0) {
 			log.Printf("[video] recv vp8 frame #%d %d bytes", recvCount, len(frameBuf))
 		}
 

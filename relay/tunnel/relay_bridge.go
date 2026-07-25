@@ -15,6 +15,8 @@ import (
 	"whitelist-bypass/relay/common"
 )
 
+const acceptErrorRetryDelay = 100 * time.Millisecond
+
 type creatorUDP struct {
 	direct *net.UDPConn
 	socks  *common.Socks5UDPSession
@@ -549,6 +551,7 @@ func (rb *RelayBridge) ListenSOCKS(addr string) error {
 				return nil
 			}
 			rb.logFn("relay: accept error: %v", err)
+			time.Sleep(acceptErrorRetryDelay)
 			continue
 		}
 		go rb.handleSOCKS(conn)

@@ -217,7 +217,7 @@ func ReadTrack(track *webrtc.TrackRemote, handler func([]byte), logFn func(strin
 			continue
 		}
 		recvCount++
-		if recvCount <= 3 || recvCount%200 == 0 {
+		if common.Debug && (recvCount <= 3 || recvCount%200 == 0) {
 			logFn("%s: recv vp8 frame #%d %d bytes", prefix, recvCount, len(frameBuf))
 		}
 		if handler != nil {

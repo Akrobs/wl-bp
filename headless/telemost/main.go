@@ -379,7 +379,9 @@ func (b *Bridge) handleMessage(raw []byte) {
 	}
 
 	if ud, ok := msg["updateDescription"]; ok {
-		log.Printf("[tm-ws] <- updateDescription %s", tmapi.BriefJSON(ud))
+		if common.Debug {
+			log.Printf("[tm-ws] <- updateDescription %s", tmapi.BriefJSON(ud))
+		}
 		udMap, _ := ud.(map[string]interface{})
 		descs, _ := udMap["description"].([]interface{})
 		b.applyDescriptionSnapshot(descs)
@@ -440,7 +442,9 @@ func (b *Bridge) handleMessage(raw []byte) {
 	}
 
 	if sc, ok := msg["slotsConfig"]; ok {
-		log.Printf("[tm-ws] <- slotsConfig %s", tmapi.BriefJSON(sc))
+		if common.Debug {
+			log.Printf("[tm-ws] <- slotsConfig %s", tmapi.BriefJSON(sc))
+		}
 		needRebind := false
 		presentPids := make(map[string]bool)
 		for _, ev := range tmapi.SlotsConfigBindings(sc) {

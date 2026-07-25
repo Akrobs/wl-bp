@@ -13,6 +13,7 @@ import (
 	"github.com/pion/rtp/codecs"
 	"github.com/pion/webrtc/v4"
 
+	"whitelist-bypass/relay/common"
 	"whitelist-bypass/relay/tunnel"
 )
 
@@ -500,7 +501,9 @@ func (c *Call) handleSpeakerCamStateChanged(params SpeakerCamStateChangedParams)
 		c.peersByID[params.SessionID] = &PeerEntry{SessionID: params.SessionID, CamState: params.CamState, JoinedAt: time.Now()}
 	}
 	c.peersMu.Unlock()
-	c.cfg.LogFn("[call] speaker_cam_state_changed session_id=%s cam=%v", params.SessionID, params.CamState)
+	if common.Debug {
+		c.cfg.LogFn("[call] speaker_cam_state_changed session_id=%s cam=%v", params.SessionID, params.CamState)
+	}
 	if params.CamState {
 		c.subscribeIfNeeded(params.SessionID)
 	}

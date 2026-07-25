@@ -741,7 +741,9 @@ func (j *TelemostHeadlessJoiner) handleMessage(raw []byte) {
 	}
 
 	if ud, ok := msg["updateDescription"]; ok {
-		j.logFn("telemost-joiner: <- updateDescription %s", tmapi.BriefJSON(ud))
+		if common.Debug {
+			j.logFn("telemost-joiner: <- updateDescription %s", tmapi.BriefJSON(ud))
+		}
 		j.ack(uid)
 		return
 	}
@@ -753,7 +755,9 @@ func (j *TelemostHeadlessJoiner) handleMessage(raw []byte) {
 	}
 
 	if sc, ok := msg["slotsConfig"]; ok {
-		j.logFn("telemost-joiner: <- slotsConfig %s", tmapi.BriefJSON(sc))
+		if common.Debug {
+			j.logFn("telemost-joiner: <- slotsConfig %s", tmapi.BriefJSON(sc))
+		}
 		needRebind := false
 		presentPids := make(map[string]bool)
 		for _, ev := range tmapi.SlotsConfigBindings(sc) {
@@ -817,7 +821,9 @@ func (j *TelemostHeadlessJoiner) handleMessage(raw []byte) {
 		if k == "uid" || k == "ack" {
 			continue
 		}
-		j.logFn("telemost-joiner: <- %s (unhandled) %s", k, tmapi.BriefJSON(v))
+		if common.Debug {
+			j.logFn("telemost-joiner: <- %s (unhandled) %s", k, tmapi.BriefJSON(v))
+		}
 		break
 	}
 

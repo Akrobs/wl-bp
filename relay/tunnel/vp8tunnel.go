@@ -221,7 +221,7 @@ func (t *VP8DataTunnel) writerLoop() {
 				if isKeepalive {
 					t.keepaliveFrames.Add(1)
 				}
-				if n <= 5 || n%500 == 0 {
+				if common.Debug && (n <= 5 || n%500 == 0) {
 					keepalives := t.keepaliveFrames.Load()
 					t.logFn("vp8tunnel: sent frame #%d size=%d data=%d keepalive=%d", n, len(sample), n-keepalives, keepalives)
 				}
@@ -249,7 +249,7 @@ func (t *VP8DataTunnel) HandleFrame(frame []byte) {
 		return
 	}
 	n := t.recvFrames.Add(1)
-	if n <= 5 || n%500 == 0 {
+	if common.Debug && (n <= 5 || n%500 == 0) {
 		t.logFn("vp8tunnel: recv frame #%d size=%d", n, len(res.Payload))
 	}
 	if t.OnData != nil {

@@ -367,7 +367,9 @@ func (c *Client) handleSignal(data []byte) {
 			c.OnParticipantUpdate(sr.Participants)
 		}
 	default:
-		c.logFn("[lk] <- signal kind=%d (%d bytes)", sr.Kind, len(data))
+		if common.Debug {
+			c.logFn("[lk] <- signal kind=%d (%d bytes)", sr.Kind, len(data))
+		}
 	}
 }
 
@@ -476,7 +478,7 @@ func (c *Client) PingLoop() {
 			return
 		}
 		sentN++
-		if sentN <= 3 || sentN%12 == 0 {
+		if common.Debug && (sentN <= 3 || sentN%12 == 0) {
 			c.logFn("[lk] ping #%d sent", sentN)
 		}
 	}

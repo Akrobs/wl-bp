@@ -7,6 +7,8 @@ import (
 	"time"
 
 	kcp "github.com/xtaci/kcp-go/v5"
+
+	"whitelist-bypass/relay/common"
 )
 
 const (
@@ -383,7 +385,7 @@ func (t *MultiTrackKCPTunnel) updateLoop() {
 				session.update()
 			}
 			ticks++
-			if ticks%kcpStatsEvery == 0 && t.logFn != nil {
+			if common.Debug && ticks%kcpStatsEvery == 0 && t.logFn != nil {
 				t.logFn("kcptunnel: sessions=%d window=%d sent=%d delivered=%d out_segs=%d in_segs=%d raw_out=%d raw_in=%d dropped=%d",
 					len(sessions), t.currentWindow.Load(), t.sentMessages.Load(), t.deliveredMessages.Load(),
 					t.outputSegments.Load(), t.inputSegments.Load(),

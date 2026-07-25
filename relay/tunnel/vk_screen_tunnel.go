@@ -5,6 +5,8 @@ import (
 	"sync"
 	"sync/atomic"
 	"time"
+
+	"whitelist-bypass/relay/common"
 )
 
 const (
@@ -134,7 +136,7 @@ func (w *ScreenWriter) emit(msg []byte) {
 		return
 	}
 	n := w.sent.Add(1)
-	if n <= 5 || n%500 == 0 {
+	if common.Debug && (n <= 5 || n%500 == 0) {
 		w.logFn("[%s] sent frame #%d size=%d", w.label, n, len(msg))
 	}
 }
@@ -252,7 +254,7 @@ func (s *SymmetricScreenTunnel) Stop() {
 func (s *SymmetricScreenTunnel) HandleScreenFrame(frame []byte) {
 	res := s.obf.Decode(frame)
 	n := s.recv.Add(1)
-	if n <= 10 || n%500 == 0 {
+	if common.Debug && (n <= 10 || n%500 == 0) {
 		s.logFn("screen recv frame #%d in=%d hasFrame=%v keepalive=%v payload=%d", n, len(frame), res.HasFrame, res.Keepalive, len(res.Payload))
 	}
 	if !res.HasFrame || res.SelfEcho || res.Keepalive || len(res.Payload) == 0 {
