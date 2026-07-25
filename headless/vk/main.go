@@ -743,6 +743,7 @@ func main() {
 		ur.readBufSize = readBuf
 		ur.maxDCBuf = maxDCBuf
 		ur.SetObfuscator(obf)
+		ur.SetUpstreamSocks(*upstreamSocks, *upstreamUser, *upstreamPass)
 		ur.OnConnected = func(tun tunnel.DataTunnel) {
 			rb := tunnel.NewRelayBridge(tun, "creator", common.VP8BufSize, log.Printf)
 			rb.SetUpstreamSocks(*upstreamSocks, *upstreamUser, *upstreamPass)
