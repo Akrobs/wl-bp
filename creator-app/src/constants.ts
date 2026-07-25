@@ -59,6 +59,7 @@ export enum IPC {
   START_BOT = 'start-bot',
   STOP_BOT = 'stop-bot',
   SET_UPSTREAM_PROXY = 'set-upstream-proxy',
+  SET_DEBUG_LOGGING = 'set-debug-logging',
   CLEAR_COOKIES = 'clear-cookies',
   EXPORT_COOKIES_ZIP = 'export-cookies-zip',
   RELAY_LOG = 'relay-log',

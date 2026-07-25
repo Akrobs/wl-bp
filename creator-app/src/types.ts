@@ -151,6 +151,7 @@ export interface Bridge {
   startBot(settings: BotSettings): Promise<void>;
   stopBot(): Promise<void>;
   setUpstreamProxy(proxy: UpstreamProxy): Promise<void>;
+  setDebugLogging(enabled: boolean): Promise<void>;
   clearCookies(platform: string): Promise<number>;
   onCreateBotTab(cb: (data: BotTabData) => void): void;
   getCallCreatorCode(scriptFile: string): Promise<string>;

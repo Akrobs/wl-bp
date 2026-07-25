@@ -236,6 +236,7 @@ struct SettingsView: View {
                 Section(NSLocalizedString("settings_display", comment: "")) {
                     TextField(NSLocalizedString("hint_display_name", comment: ""), text: $proxyManager.displayName)
                     Toggle(NSLocalizedString("settings_show_logs", comment: ""), isOn: $proxyManager.showLogs)
+                    Toggle(NSLocalizedString("settings_debug", comment: ""), isOn: $proxyManager.debug)
                 }
 
                 Section(NSLocalizedString("settings_vp8_pacing", comment: "")) {

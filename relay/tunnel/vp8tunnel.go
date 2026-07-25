@@ -7,6 +7,8 @@ import (
 
 	"github.com/pion/webrtc/v4"
 	"github.com/pion/webrtc/v4/pkg/media"
+
+	"whitelist-bypass/relay/common"
 )
 
 const (
@@ -210,7 +212,9 @@ func (t *VP8DataTunnel) writerLoop() {
 					continue
 				}
 				if err := t.track.WriteSample(media.Sample{Data: sample, Duration: sampleInterval}); err != nil {
-					t.logFn("vp8tunnel: WriteSample error: %v", err)
+					if common.Debug {
+						t.logFn("vp8tunnel: WriteSample error: %v", err)
+					}
 					continue
 				}
 				n := t.sentFrames.Add(1)

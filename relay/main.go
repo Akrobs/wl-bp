@@ -32,7 +32,9 @@ func main() {
 	upstreamUser := flag.String("upstream-user", "", "upstream SOCKS5 username")
 	upstreamPass := flag.String("upstream-pass", "", "upstream SOCKS5 password")
 	flag.String("local-ip", "", "local IP address (unused, passed via hook)")
+	debugFlag := flag.Bool("debug", false, "verbose debug logging")
 	flag.Parse()
+	common.Debug = *debugFlag
 
 	if *mode == "" {
 		fmt.Fprintf(os.Stderr, "Usage: relay --mode dc-joiner|dc-creator|vk-video-joiner|vk-video-creator|telemost-video-joiner|telemost-video-creator\n")

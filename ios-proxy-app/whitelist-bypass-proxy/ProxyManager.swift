@@ -178,6 +178,7 @@ class ProxyManager: ObservableObject {
     @Published var vp8Batch: Int = AppDefaults.vp8Batch { didSet { AppDefaults.vp8Batch = vp8Batch } }
     @Published var dualTrack: Bool = AppDefaults.dualTrack { didSet { AppDefaults.dualTrack = dualTrack } }
     @Published var reliable: Bool = AppDefaults.reliable { didSet { AppDefaults.reliable = reliable } }
+    @Published var debug: Bool = AppDefaults.debug { didSet { AppDefaults.debug = debug } }
 
     private let autoSocksUser: String
     private let autoSocksPass: String
@@ -294,6 +295,8 @@ class ProxyManager: ObservableObject {
             tunnelMode = .video
             showToast(NSLocalizedString("dc_mode_not_supported", comment: ""))
         }
+
+        IosSetDebug(debug)
 
         switch detectedPlatform {
         case .telemost:

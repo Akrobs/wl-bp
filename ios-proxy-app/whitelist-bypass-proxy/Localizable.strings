@@ -25,6 +25,7 @@
 "settings_auth_manual" = "Manual";
 "settings_display" = "Display";
 "settings_show_logs" = "Show Logs";
+"settings_debug" = "Debug logging";
 "settings_vp8_pacing" = "VP8 settings";
 "settings_vp8_fps" = "FPS";
 "settings_vp8_batch" = "Batch";

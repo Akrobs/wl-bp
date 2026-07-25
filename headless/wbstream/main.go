@@ -25,7 +25,9 @@ func main() {
 	upstreamSocks := flag.String("upstream-socks", "", "route tunneled egress through this SOCKS5 proxy (host:port), e.g. a local VPN client")
 	upstreamUser := flag.String("upstream-user", "", "upstream SOCKS5 username")
 	upstreamPass := flag.String("upstream-pass", "", "upstream SOCKS5 password")
+	debugFlag := flag.Bool("debug", false, "verbose debug logging")
 	flag.Parse()
+	common.Debug = *debugFlag
 
 	var readBuf int
 	var memLimit int64

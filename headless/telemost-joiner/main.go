@@ -51,7 +51,9 @@ func main() {
 	resources := flag.String("resources", "default", "resource mode: moderate, default, unlimited")
 	vp8FPS := flag.Int("vp8-fps", 24, "VP8 frame rate")
 	vp8Batch := flag.Int("vp8-batch", 30, "VP8 batch multiplier")
+	debugFlag := flag.Bool("debug", false, "verbose debug logging")
 	flag.Parse()
+	common.Debug = *debugFlag
 
 	if *tmLink == "" {
 		log.Fatal("--tm-link is required")

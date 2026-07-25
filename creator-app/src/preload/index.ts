@@ -26,6 +26,9 @@ import { IPC } from '../constants';
   setUpstreamProxy(proxy: any) {
     return ipcRenderer.invoke(IPC.SET_UPSTREAM_PROXY, proxy);
   },
+  setDebugLogging(enabled: boolean) {
+    return ipcRenderer.invoke(IPC.SET_DEBUG_LOGGING, enabled);
+  },
   clearCookies(platform: string) {
     return ipcRenderer.invoke(IPC.CLEAR_COOKIES, platform);
   },

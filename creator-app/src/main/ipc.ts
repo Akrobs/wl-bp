@@ -90,6 +90,10 @@ export function registerIpcHandlers(tabManager: TabManager): void {
     tabManager.setUpstreamProxy(proxy);
   });
 
+  ipcMain.handle(IPC.SET_DEBUG_LOGGING, (_e, enabled: boolean) => {
+    tabManager.setDebugLogging(enabled);
+  });
+
   ipcMain.handle(IPC.CLEAR_COOKIES, (_e, platform: string) => {
     return tabManager.clearPlatformCookies(platform as Platform);
   });

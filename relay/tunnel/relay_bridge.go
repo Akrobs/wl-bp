@@ -15,8 +15,6 @@ import (
 	"whitelist-bypass/relay/common"
 )
 
-const verboseUDPLogging = false
-
 type creatorUDP struct {
 	direct *net.UDPConn
 	socks  *common.Socks5UDPSession
@@ -293,7 +291,7 @@ func (rb *RelayBridge) handleJoinerMessage(connID uint32, msgType byte, payload 
 				rb.logFn("relay[joiner]: drop msgType=%d for unknown conn %d (payload=%dB), NACK once", msgType, connID, len(payload))
 				rb.send(connID, MsgClose, nil)
 			}
-		} else {
+		} else if common.Debug {
 			rb.logFn("relay[joiner]: drop msgType=%d for unknown conn %d (payload=%dB)", msgType, connID, len(payload))
 		}
 		return
@@ -314,7 +312,9 @@ func (rb *RelayBridge) handleJoinerMessage(connID uint32, msgType byte, payload 
 		}
 	case MsgData:
 		if _, err := sc.conn.Write(payload); err != nil {
-			rb.logFn("relay[joiner]: write to socks %d failed: %s", connID, common.MaskError(err))
+			if common.Debug {
+				rb.logFn("relay[joiner]: write to socks %d failed: %s", connID, common.MaskError(err))
+			}
 		}
 	case MsgClose:
 		sc.conn.Close()
@@ -333,13 +333,17 @@ func (rb *RelayBridge) handleCreatorMessage(connID uint32, msgType byte, payload
 	case MsgData:
 		val, ok := rb.conns.Load(connID)
 		if !ok {
-			rb.logFn("relay[creator]: drop MsgData for unknown conn %d (payload=%dB)", connID, len(payload))
+			if common.Debug {
+				rb.logFn("relay[creator]: drop MsgData for unknown conn %d (payload=%dB)", connID, len(payload))
+			}
 			rb.send(connID, MsgClose, nil)
 			return
 		}
 		if c, ok := val.(net.Conn); ok {
 			if _, err := c.Write(payload); err != nil {
-				rb.logFn("relay[creator]: write to target %d failed: %s", connID, common.MaskError(err))
+				if common.Debug {
+					rb.logFn("relay[creator]: write to target %d failed: %s", connID, common.MaskError(err))
+				}
 			}
 		}
 	case MsgClose:
@@ -402,7 +406,7 @@ func (rb *RelayBridge) handleUDP(connID uint32, payload []byte) {
 			egress = existing
 		} else {
 			egress = created
-			if verboseUDPLogging {
+			if common.Debug {
 				rb.logFn("relay[creator]: UDP %d session opened -> %s payload=%dB", connID, addr, len(data))
 			}
 			go func(e *creatorUDP, id uint32, target string) {
@@ -416,14 +420,14 @@ func (rb *RelayBridge) handleUDP(connID uint32, payload []byte) {
 					e.setReadDeadline(time.Now().Add(60 * time.Second))
 					n, err := e.read(buf)
 					if err != nil {
-						if verboseUDPLogging {
+						if common.Debug {
 							rb.logFn("relay[creator]: UDP %d session %s closed after %d replies, %dB in: %v", id, target, replies, totalIn, err)
 						}
 						return
 					}
 					replies++
 					totalIn += int64(n)
-					if verboseUDPLogging && replies == 1 {
+					if common.Debug && replies == 1 {
 						rb.logFn("relay[creator]: UDP %d first reply %dB from %s", id, n, target)
 					}
 					rb.send(id, MsgUDPReply, buf[:n])
@@ -433,7 +437,9 @@ func (rb *RelayBridge) handleUDP(connID uint32, payload []byte) {
 	}
 
 	if err := egress.writePacket(data, addr); err != nil {
-		rb.logFn("relay[creator]: UDP %d write %s failed: %v", connID, common.MaskAddr(addr), err)
+		if common.Debug {
+			rb.logFn("relay[creator]: UDP %d write %s failed: %v", connID, common.MaskAddr(addr), err)
+		}
 	}
 }
 
@@ -572,7 +578,7 @@ func (rb *RelayBridge) handleSOCKS(conn net.Conn) {
 	}
 	cmd := buf[1]
 	if cmd == common.CmdUDP {
-		if verboseUDPLogging {
+		if common.Debug {
 			rb.logFn("relay: SOCKS UDP ASSOCIATE from %s", conn.RemoteAddr())
 		}
 		rb.handleUDPAssociate(conn)
@@ -698,7 +704,7 @@ func (rb *RelayBridge) handleUDPAssociate(tcpConn net.Conn) {
 	reply := []byte{common.Ver, 0x00, 0x00, common.AtypIPv4, 127, 0, 0, 1, 0, 0}
 	binary.BigEndian.PutUint16(reply[8:10], uint16(localAddr.Port))
 	tcpConn.Write(reply)
-	if verboseUDPLogging {
+	if common.Debug {
 		rb.logFn("relay: SOCKS UDP listener bound on 127.0.0.1:%d ctrl=%s", localAddr.Port, tcpConn.RemoteAddr())
 	}
 
@@ -717,7 +723,7 @@ func (rb *RelayBridge) handleUDPAssociate(tcpConn net.Conn) {
 		defer func() {
 			sessionMu.Lock()
 			defer sessionMu.Unlock()
-			if verboseUDPLogging {
+			if common.Debug {
 				rb.logFn("relay: SOCKS UDP listener 127.0.0.1:%d closing, releasing %d sessions", localAddr.Port, len(sessionKeys))
 			}
 			for _, k := range sessionKeys {
@@ -768,7 +774,7 @@ func (rb *RelayBridge) handleUDPAssociate(tcpConn net.Conn) {
 				sessionMu.Lock()
 				sessionKeys = append(sessionKeys, mapKey)
 				sessionMu.Unlock()
-				if verboseUDPLogging {
+				if common.Debug {
 					rb.logFn("relay[joiner]: UDP session %d (%s -> %s) opened, first packet %dB", id, addr, dstAddr, n-headerLen)
 				}
 			}

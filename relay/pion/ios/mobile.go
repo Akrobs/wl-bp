@@ -39,7 +39,7 @@ type iosStatusEmitter struct {
 	statusFn func(string)
 }
 
-func (e *iosStatusEmitter) EmitStatus(status string)  { e.statusFn(status) }
+func (e *iosStatusEmitter) EmitStatus(status string)   { e.statusFn(status) }
 func (e *iosStatusEmitter) EmitStatusError(msg string) { e.statusFn("ERROR:" + msg) }
 
 type iosCacheStore struct {
@@ -47,7 +47,7 @@ type iosCacheStore struct {
 }
 
 func (c *iosCacheStore) Save(key string, value string) { c.callback.SaveCache(key, value) }
-func (c *iosCacheStore) Load(key string) string         { return c.callback.LoadCache(key) }
+func (c *iosCacheStore) Load(key string) string        { return c.callback.LoadCache(key) }
 
 func makeOnConnected(socksPort int, socksUser, socksPass string, logFn func(string, ...any), callback HeadlessCallback) func(tunnel.DataTunnel) {
 	return func(tun tunnel.DataTunnel) {
@@ -116,6 +116,8 @@ func makeHelpers(callback HeadlessCallback) (func(string, ...any), joiner.Resolv
 
 func init() {
 }
+
+func SetDebug(enabled bool) { common.Debug = enabled }
 
 func StartWBStreamHeadless(socksPort int, socksUser, socksPass string, callback HeadlessCallback) {
 	StopHeadless()

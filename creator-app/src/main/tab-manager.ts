@@ -53,6 +53,7 @@ export class TabManager {
   private headlessDionPath: string;
   private hooksDir: string;
   private upstreamProxy: UpstreamProxy = { socks: '', user: '', pass: '' };
+  private debugLogging = false;
 
   constructor() {
     this.relayPath = resolveResourcePath(
@@ -223,6 +224,10 @@ export class TabManager {
     };
   }
 
+  setDebugLogging(enabled: boolean): void {
+    this.debugLogging = enabled;
+  }
+
   private appendUpstreamArgs(args: string[]): void {
     if (!this.upstreamProxy.socks) return;
     args.push('--upstream-socks', this.upstreamProxy.socks);
@@ -241,6 +246,7 @@ export class TabManager {
     }
     const relayArgs = ['--mode', relayMode, '--ws-port', String(port)];
     this.appendUpstreamArgs(relayArgs);
+    if (this.debugLogging) relayArgs.push('--debug');
     const proc = spawn(this.relayPath, relayArgs, {
       stdio: ['ignore', 'pipe', 'pipe'],
     });
@@ -371,6 +377,7 @@ export class TabManager {
       if (flag) spawnArgs.push(flag, joinTarget);
     }
     this.appendUpstreamArgs(spawnArgs);
+    if (this.debugLogging) spawnArgs.push('--debug');
     const proc = spawn(config.binaryPath, spawnArgs, {
       stdio: ['ignore', 'pipe', 'pipe'],
     });

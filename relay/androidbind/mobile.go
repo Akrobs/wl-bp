@@ -123,6 +123,8 @@ var activeJoiner struct {
 func ActiveWsPort() int    { return activeJoiner.wsPort }
 func ActiveSocksPort() int { return activeJoiner.socksPort }
 
+func SetDebug(enabled bool) { common.Debug = enabled }
+
 func StopJoiner() {
 	activeJoiner.Lock()
 	defer activeJoiner.Unlock()

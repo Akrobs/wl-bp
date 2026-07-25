@@ -123,6 +123,10 @@ object Prefs {
         get() = prefs.getBoolean(PrefsKeys.RELIABLE, false)
         set(value) = prefs.edit { putBoolean(PrefsKeys.RELIABLE, value) }
 
+    var debug: Boolean
+        get() = prefs.getBoolean(PrefsKeys.DEBUG, false)
+        set(value) = prefs.edit { putBoolean(PrefsKeys.DEBUG, value) }
+
     var savedDestinations: List<CallConfig>
         get() = CallConfig.listFromJson(prefs.getString(PrefsKeys.SAVED_DESTINATIONS, "") ?: "")
         set(value) = prefs.edit { putString(PrefsKeys.SAVED_DESTINATIONS, CallConfig.listToJson(value)) }

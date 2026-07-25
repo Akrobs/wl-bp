@@ -254,7 +254,9 @@ func (u *TunnelRelay) handleDCMessage(data []byte) {
 	if u.obf != nil {
 		pt, ok := u.obf.DecryptPayload(data)
 		if !ok {
-			log.Printf("[dc] decrypt failed, dropping %d bytes", len(data))
+			if common.Debug {
+				log.Printf("[dc] decrypt failed, dropping %d bytes", len(data))
+			}
 			return
 		}
 		data = pt
@@ -280,7 +282,9 @@ func (u *TunnelRelay) handleDCMessage(data []byte) {
 			select {
 			case dc.ch <- cp:
 			default:
-				log.Printf("[dc] conn %d write queue full, dropping %d bytes", connID, len(payload))
+				if common.Debug {
+					log.Printf("[dc] conn %d write queue full, dropping %d bytes", connID, len(payload))
+				}
 			}
 		}
 	case tunnel.MsgClose:

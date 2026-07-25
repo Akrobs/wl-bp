@@ -89,6 +89,8 @@ function bindSettingsEvents(): void {
     tm.upstreamProxy.user = (document.getElementById('upstreamUser') as HTMLInputElement).value.trim();
     tm.upstreamProxy.pass = (document.getElementById('upstreamPass') as HTMLInputElement).value.trim();
     tm.saveUpstreamProxy();
+    tm.debugLogging = (document.getElementById('debugLogging') as HTMLInputElement).checked;
+    tm.saveDebugLogging();
     closeSettings();
   });
   document.querySelectorAll('.btn-clear-cookies').forEach((btn) => {
@@ -174,6 +176,7 @@ function openSettings(): void {
   (document.getElementById('upstreamSocks') as HTMLInputElement).value = tm.upstreamProxy.socks;
   (document.getElementById('upstreamUser') as HTMLInputElement).value = tm.upstreamProxy.user;
   (document.getElementById('upstreamPass') as HTMLInputElement).value = tm.upstreamProxy.pass;
+  (document.getElementById('debugLogging') as HTMLInputElement).checked = tm.debugLogging;
   document.getElementById('clearCookiesStatus')!.textContent = '';
 }
 

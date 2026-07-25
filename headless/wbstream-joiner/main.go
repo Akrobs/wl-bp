@@ -28,7 +28,9 @@ func main() {
 	vp8Batch := flag.Int("vp8-batch", 30, "VP8 batch multiplier (video mode only)")
 	dualTrack := flag.Bool("dual-track", false, "publish a second VP8 track as ScreenShare and shard outbound across both (video mode only)")
 	reliable := flag.Bool("reliable", false, "wrap the video tunnel with KCP reliability (video mode only)")
+	debugFlag := flag.Bool("debug", false, "verbose debug logging")
 	flag.Parse()
+	common.Debug = *debugFlag
 
 	if *roomFlag == "" {
 		log.Fatal("--room is required")
