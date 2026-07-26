@@ -97,6 +97,8 @@
 
     <string name="paste_from_clipboard">Paste from clipboard</string>
     <string name="clipboard_empty">Clipboard is empty</string>
+    <string name="scan_qr_title">Scan QR code</string>
+    <string name="scan_qr_prompt">Point the camera at the QR code shown in the creator app</string>
 
 
     <string name="settings_row_tunnel_mode">Tunnel mode</string>

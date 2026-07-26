@@ -64,6 +64,7 @@ export enum IPC {
   GET_DION_CREDENTIALS = 'get-dion-credentials',
   SET_DION_CREDENTIALS = 'set-dion-credentials',
   EXPORT_COOKIES_ZIP = 'export-cookies-zip',
+  RENDER_QR = 'render-qr',
   RELAY_LOG = 'relay-log',
   CREATE_BOT_TAB = 'create-bot-tab',
   CLOSE_BOT_TAB = 'close-bot-tab',

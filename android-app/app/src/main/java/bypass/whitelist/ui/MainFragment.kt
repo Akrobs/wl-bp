@@ -11,8 +11,17 @@ import bypass.whitelist.tunnel.CallPlatform
 import bypass.whitelist.tunnel.TunnelMode
 import bypass.whitelist.tunnel.VpnStatus
 import bypass.whitelist.util.Prefs
+import com.journeyapps.barcodescanner.ScanContract
+import com.journeyapps.barcodescanner.ScanOptions
 
 class MainFragment : Fragment(R.layout.fragment_main_screen) {
+
+    private val scanQrLauncher = registerForActivityResult(ScanContract()) { result ->
+        val scanned = result.contents?.trim().orEmpty()
+        if (scanned.isNotEmpty()) {
+            AddDestinationSheet.show(parentFragmentManager, scanned)
+        }
+    }
 
     private var content: MainFragmentView? = null
     private var pendingStatus: VpnStatus? = null
@@ -43,6 +52,16 @@ class MainFragment : Fragment(R.layout.fragment_main_screen) {
 
         container.onAddCallClicked = {
             AddDestinationSheet.show(parentFragmentManager)
+        }
+        container.onScanQrClicked = {
+            scanQrLauncher.launch(
+                ScanOptions()
+                    .setDesiredBarcodeFormats(ScanOptions.QR_CODE)
+                    .setPrompt(getString(R.string.scan_qr_prompt))
+                    .setBeepEnabled(false)
+                    .setOrientationLocked(false)
+                    .setCaptureActivity(QrCaptureActivity::class.java)
+            )
         }
         container.onHeroPressed = {
             if (isHostConnected() || isHostConnecting()) {

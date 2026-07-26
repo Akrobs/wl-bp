@@ -296,6 +296,25 @@ body {
   color: #888;
 }
 
+.headless-qr {
+  margin-top: 16px;
+}
+
+.headless-qr img {
+  width: 180px;
+  height: 180px;
+  display: block;
+  background: #fff;
+  padding: 8px;
+  border-radius: 6px;
+}
+
+.headless-qr-hint {
+  margin-top: 6px;
+  color: #888;
+  font-size: 12px;
+}
+
 .headless-link {
   color: #4fc3f7;
   cursor: pointer;

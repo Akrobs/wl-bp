@@ -50,6 +50,9 @@ import { IPC } from '../constants';
   exportCookiesZip() {
     return ipcRenderer.invoke(IPC.EXPORT_COOKIES_ZIP);
   },
+  renderQr(text: string) {
+    return ipcRenderer.invoke(IPC.RENDER_QR, text);
+  },
   startHeadless(tabId: string, platform: string, args: any) {
     return ipcRenderer.invoke(IPC.START_HEADLESS, tabId, platform, args);
   },

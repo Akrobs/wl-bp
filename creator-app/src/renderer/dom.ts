@@ -114,10 +114,14 @@ export function renderContent(tm: RendererTabManager): void {
         document.getElementById('headlessTurn')!.textContent = callInfo.turn || '';
         document.getElementById('headlessProtocol')!.textContent = callInfo.protocol || '';
       }
+      renderJoinQr(callInfo.joinLink || '');
+    } else {
+      renderJoinQr('');
     }
   } else {
     toolbar.style.display = 'flex';
     headlessInfo.style.display = 'none';
+    renderJoinQr('');
     const isVK = activeTab.platform === Platform.VK && activeTab.url.includes('vk.ru');
     const modeSelect = document.getElementById('modeSelect') as HTMLSelectElement;
     const tunnelLabel = document.getElementById('tunnelLabel') as HTMLElement;
@@ -293,6 +297,34 @@ export function exportCookiesZip(): void {
     anchor.download = 'cookies.zip';
     anchor.click();
     URL.revokeObjectURL(anchor.href);
+  });
+}
+
+let renderedQrText = '';
+
+function renderJoinQr(link: string): void {
+  const wrap = document.getElementById('headlessQrWrap') as HTMLElement | null;
+  const image = document.getElementById('headlessQr') as HTMLImageElement | null;
+  if (!wrap || !image) return;
+  if (!link) {
+    renderedQrText = '';
+    wrap.style.display = 'none';
+    image.removeAttribute('src');
+    return;
+  }
+  if (link === renderedQrText) {
+    wrap.style.display = 'block';
+    return;
+  }
+  renderedQrText = link;
+  (window as any).bridge.renderQr(link).then((dataUrl: string) => {
+    if (renderedQrText !== link) return;
+    if (!dataUrl) {
+      wrap.style.display = 'none';
+      return;
+    }
+    image.src = dataUrl;
+    wrap.style.display = 'block';
   });
 }
 
