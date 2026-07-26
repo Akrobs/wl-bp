@@ -117,7 +117,7 @@ func main() {
 		startVideo(*mode, c, joinerCallback)
 	case "vk-headless-joiner":
 		c := android.NewVKHeadlessJoiner(log.Printf)
-		c.OnConnected = newPersistentJoinerBridge(nil)
+		c.OnConnected = newPersistentJoinerBridge(c.MarkConfigAcked)
 		c.Run()
 	case "vk-video-creator":
 		c := pion.NewVKClient(log.Printf)
@@ -125,7 +125,7 @@ func main() {
 		startVideo(*mode, c, creatorCallback)
 	case "telemost-headless-joiner":
 		c := android.NewTelemostHeadlessJoiner(log.Printf)
-		c.OnConnected = newPersistentJoinerBridge(nil)
+		c.OnConnected = newPersistentJoinerBridge(c.MarkConfigAcked)
 		c.Run()
 	case "telemost-video-joiner":
 		c := pion.NewTelemostClient(log.Printf)

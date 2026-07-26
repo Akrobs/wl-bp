@@ -88,6 +88,7 @@ func main() {
 			readBuf = common.DCBufSize
 		}
 		bridge := tunnel.NewRelayBridgeWithAuth(tun, "joiner", readBuf, log.Printf, *socksUser, *socksPass)
+		bridge.SetOnConfigAck(inner.MarkConfigAcked)
 		bridge.MarkReady()
 		addr := fmt.Sprintf("%s:%d", *socksHost, *socksPort)
 		go func() {

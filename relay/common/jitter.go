@@ -24,3 +24,17 @@ func BackoffWithJitter(attempt int, initialDelay, maxDelay time.Duration) time.D
 	floor := ceiling / backoffJitterFloorDivisor
 	return floor + time.Duration(rand.Int64N(int64(ceiling-floor)+1))
 }
+
+func DurationInRange(minDuration, maxDuration time.Duration) time.Duration {
+	if maxDuration <= minDuration {
+		return minDuration
+	}
+	return minDuration + time.Duration(rand.Int64N(int64(maxDuration-minDuration)+1))
+}
+
+func IntInRange(minValue, maxValue int) int {
+	if maxValue <= minValue {
+		return minValue
+	}
+	return minValue + rand.IntN(maxValue-minValue+1)
+}

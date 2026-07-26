@@ -80,6 +80,7 @@ type TelemostHeadlessJoiner struct {
 
 	stopCh           chan struct{}
 	stopOnce         sync.Once
+	configAck        configAckTracker
 	reconnectAttempt atomic.Int32
 
 	setSlotsKey     int
@@ -165,6 +166,8 @@ func (j *TelemostHeadlessJoiner) runOnce() error {
 	j.connectAndRun()
 	return nil
 }
+
+func (j *TelemostHeadlessJoiner) MarkConfigAcked() { j.configAck.mark() }
 
 func (j *TelemostHeadlessJoiner) waitBeforeRetry(attempt int) bool {
 	return waitReconnectBackoff(attempt, j.logFn, "telemost-joiner", j.stopCh, j.isClosed)
@@ -468,9 +471,14 @@ func (j *TelemostHeadlessJoiner) initPC() {
 			j.logFn("telemost-joiner: === VP8 TUNNEL CONNECTED ===")
 			j.Status.EmitStatus(common.StatusTunnelConnected)
 			j.vp8tunnel = tunnel.NewVP8DataTunnel(j.sampleTrack, j.obf, j.logFn)
-			j.vp8tunnel.Start(j.vp8FPS, j.vp8Batch)
-			j.vp8tunnel.SendData(tunnel.EncodeVP8Config(j.vp8tunnel.FPS(), j.vp8tunnel.Batch(), 1))
-			j.logFn("telemost-joiner: pushed vp8 config to creator fps=%d batch=%d", j.vp8tunnel.FPS(), j.vp8tunnel.Batch())
+			vp8tun := j.vp8tunnel
+			vp8tun.Start(j.vp8FPS, j.vp8Batch)
+			if !j.configAck.acknowledged() {
+				acked, cancel := j.configAck.arm()
+				go sendVP8ConfigUntilAcked(acked, cancel, j.stopCh, vp8tun,
+					vp8tun.FPS(), vp8tun.Batch(), 1, j.logFn, "telemost-joiner")
+				j.logFn("telemost-joiner: pushed vp8 config to creator fps=%d batch=%d", vp8tun.FPS(), vp8tun.Batch())
+			}
 			if j.OnConnected != nil {
 				j.OnConnected(j.vp8tunnel)
 			}

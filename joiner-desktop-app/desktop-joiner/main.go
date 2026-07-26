@@ -37,6 +37,7 @@ type statusEmitter struct{}
 
 var tunnelLostCh = make(chan struct{}, 1)
 var selfHealReconnect bool
+var joinerConfigAck func()
 
 func (statusEmitter) EmitStatus(status string) {
 	log.Printf("[status] %s", status)
@@ -253,10 +254,16 @@ func main() {
 		// listener instead of binding a second one
 		if bridge != nil {
 			bridge.SwapTunnel(t)
+			if joinerConfigAck != nil {
+				bridge.SetOnConfigAck(joinerConfigAck)
+			}
 			log.Printf("[socks] tunnel swapped after reconnect")
 			return
 		}
 		bridge = tunnel.NewRelayBridgeWithAuth(t, "joiner", readBuf, log.Printf, *socksUser, *socksPass)
+		if joinerConfigAck != nil {
+			bridge.SetOnConfigAck(joinerConfigAck)
+		}
 		bridge.SetPersistentListener(true)
 		bridge.MarkReady()
 		addr := fmt.Sprintf("%s:%d", *socksHost, *socksPort)
@@ -369,6 +376,7 @@ func runWBStream(link, name, mode string, fps, batch int, dualTrack, reliable bo
 		ScreenShare: dualTrack,
 		Reliable:    reliable,
 	})
+	joinerConfigAck = sess.MarkConfigAcked
 	sess.OnConnected = onConnected
 	sess.OnRemoteCandidate = onCandidate
 
@@ -389,6 +397,7 @@ func runTelemost(link, name string, fps, batch int,
 		pion.AddTunnelTracks,
 		pion.ReadTrack,
 	)
+	joinerConfigAck = inner.MarkConfigAcked
 	inner.OnConnected = onConnected
 	inner.OnRemoteCandidate = onCandidate
 
@@ -440,6 +449,7 @@ func runVK(link, name, mode string, fps, batch int, dualTrack bool,
 		pion.AddTunnelTracks,
 		pion.ReadTrack,
 	)
+	joinerConfigAck = inner.MarkConfigAcked
 	inner.OnConnected = onConnected
 	inner.OnRemoteCandidate = onCandidate
 	go inner.RunWithParams(string(patched))
