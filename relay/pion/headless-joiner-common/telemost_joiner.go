@@ -22,11 +22,9 @@ import (
 )
 
 const (
-	TmAPIBase                     = tmapi.APIBase
-	TmOrigin                      = tmapi.Origin
-	TmPingPeriod                  = 5 * time.Second
-	telemostReconnectInitialDelay = time.Second
-	telemostReconnectMaxDelay     = 16 * time.Second
+	TmAPIBase    = tmapi.APIBase
+	TmOrigin     = tmapi.Origin
+	TmPingPeriod = 5 * time.Second
 )
 
 type TelemostHeadlessJoiner struct {
@@ -169,19 +167,7 @@ func (j *TelemostHeadlessJoiner) runOnce() error {
 }
 
 func (j *TelemostHeadlessJoiner) waitBeforeRetry(attempt int) bool {
-	delay := telemostReconnectInitialDelay << attempt
-	if delay > telemostReconnectMaxDelay || delay <= 0 {
-		delay = telemostReconnectMaxDelay
-	}
-	j.logFn("telemost-joiner: waiting %s before reconnect", delay)
-	timer := time.NewTimer(delay)
-	defer timer.Stop()
-	select {
-	case <-timer.C:
-		return !j.isClosed()
-	case <-j.stopCh:
-		return false
-	}
+	return waitReconnectBackoff(attempt, j.logFn, "telemost-joiner", j.stopCh, j.isClosed)
 }
 
 func (j *TelemostHeadlessJoiner) resetSessionState() {

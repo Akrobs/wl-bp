@@ -16,11 +16,6 @@ import (
 	"whitelist-bypass/relay/wbstream"
 )
 
-const (
-	reconnectInitialDelay = time.Second
-	reconnectMaxDelay     = 16 * time.Second
-)
-
 type WBStreamHeadlessJoiner struct {
 	logFn       func(string, ...any)
 	OnConnected func(tunnel.DataTunnel)
@@ -179,19 +174,7 @@ func (j *WBStreamHeadlessJoiner) MarkConfigAcked() {
 }
 
 func (j *WBStreamHeadlessJoiner) waitBeforeRetry(attempt int) bool {
-	delay := reconnectInitialDelay << attempt
-	if delay > reconnectMaxDelay || delay <= 0 {
-		delay = reconnectMaxDelay
-	}
-	j.logFn("wbstream-joiner: waiting %s before reconnect", delay)
-	timer := time.NewTimer(delay)
-	defer timer.Stop()
-	select {
-	case <-timer.C:
-		return !j.isClosed()
-	case <-j.stopCh:
-		return false
-	}
+	return waitReconnectBackoff(attempt, j.logFn, "wbstream-joiner", j.stopCh, j.isClosed)
 }
 
 func (j *WBStreamHeadlessJoiner) clearSession(sess *wbstream.Session) {

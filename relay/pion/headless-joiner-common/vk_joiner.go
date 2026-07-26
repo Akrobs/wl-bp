@@ -21,11 +21,7 @@ import (
 	"whitelist-bypass/relay/wtsignal"
 )
 
-const (
-	vkReconnectInitialDelay = time.Second
-	vkReconnectMaxDelay     = 16 * time.Second
-	vkMaxReconnectAttempts = 10
-)
+const vkMaxReconnectAttempts = 10
 
 const vkTopologyDirect = "DIRECT"
 
@@ -192,19 +188,7 @@ func (h *VKHeadlessJoiner) runOnce() error {
 }
 
 func (h *VKHeadlessJoiner) waitBeforeRetry(attempt int) bool {
-	delay := vkReconnectInitialDelay << attempt
-	if delay > vkReconnectMaxDelay || delay <= 0 {
-		delay = vkReconnectMaxDelay
-	}
-	h.logFn("headless: waiting %s before reconnect", delay)
-	timer := time.NewTimer(delay)
-	defer timer.Stop()
-	select {
-	case <-timer.C:
-		return !h.isClosed()
-	case <-h.stopCh:
-		return false
-	}
+	return waitReconnectBackoff(attempt, h.logFn, "headless", h.stopCh, h.isClosed)
 }
 
 func (h *VKHeadlessJoiner) isClosed() bool {
