@@ -71,6 +71,22 @@ export interface UpstreamProxy {
   pass: string;
 }
 
+export interface CookieEntry {
+  name: string;
+  value: string;
+}
+
+export interface CookieFileContent {
+  email?: string;
+  password?: string;
+  cookies: CookieEntry[];
+}
+
+export interface DionCredentials {
+  email: string;
+  password: string;
+}
+
 export interface TabConfig {
   mode: TunnelMode;
   peerId: number;
@@ -153,6 +169,8 @@ export interface Bridge {
   setUpstreamProxy(proxy: UpstreamProxy): Promise<void>;
   setDebugLogging(enabled: boolean): Promise<void>;
   clearCookies(platform: string): Promise<number>;
+  getDionCredentials(): Promise<DionCredentials>;
+  setDionCredentials(email: string, password: string): Promise<void>;
   onCreateBotTab(cb: (data: BotTabData) => void): void;
   getCallCreatorCode(scriptFile: string): Promise<string>;
   onBotError(cb: (msg: string) => void): void;

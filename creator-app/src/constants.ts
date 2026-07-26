@@ -61,6 +61,8 @@ export enum IPC {
   SET_UPSTREAM_PROXY = 'set-upstream-proxy',
   SET_DEBUG_LOGGING = 'set-debug-logging',
   CLEAR_COOKIES = 'clear-cookies',
+  GET_DION_CREDENTIALS = 'get-dion-credentials',
+  SET_DION_CREDENTIALS = 'set-dion-credentials',
   EXPORT_COOKIES_ZIP = 'export-cookies-zip',
   RELAY_LOG = 'relay-log',
   CREATE_BOT_TAB = 'create-bot-tab',

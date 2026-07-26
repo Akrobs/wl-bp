@@ -56,6 +56,12 @@ func main() {
 	if err := auth.LoadCookiesFromFile(*cookiesPath); err != nil {
 		log.Fatalf("[FATAL] LoadCookiesFromFile: %v", err)
 	}
+	if !auth.HasCredentials() && !auth.HasRefreshCookie() {
+		log.Fatalf("[FATAL] %s has neither cookies nor credentials, add \"email\" and \"password\" fields to it", *cookiesPath)
+	}
+	if auth.HasCredentials() {
+		log.Printf("[auth] credentials present, session will re-login automatically when the refresh token dies")
+	}
 	if err := auth.EnsureValidToken(); err != nil {
 		log.Fatalf("[FATAL] EnsureValidToken: %v", err)
 	}

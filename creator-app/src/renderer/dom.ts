@@ -68,6 +68,8 @@ export function renderContent(tm: RendererTabManager): void {
       targetInput.value = activeTab.headlessStartTarget || '';
       targetInput.classList.remove('invalid');
       errorEl.textContent = '';
+      const dionAccountCard = document.getElementById('headlessDionAccountCard')!;
+      dionAccountCard.style.display = activeTab.platform === Platform.Dion ? '' : 'none';
       if (activeTab.platform === Platform.WBStream) {
         targetLabel.textContent = 'Paste a room id or stream.wb.ru/room/<id> link.';
         targetInput.placeholder = 'https://stream.wb.ru/room/<id>';

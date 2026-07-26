@@ -49,6 +49,11 @@
         <div class="headless-start-error" id="headlessStartError"></div>
         <button class="headless-start-btn" id="btnHeadlessJoin">Join existing</button>
       </div>
+      <div class="headless-start-card" id="headlessDionAccountCard" style="display:none">
+        <div class="headless-start-card-title">DION account</div>
+        <div class="headless-start-card-desc">Store an email and password so the session renews itself and never asks for a browser login.</div>
+        <button class="headless-start-btn" id="btnDionAccount">Edit credentials</button>
+      </div>
     </div>
     <div class="headless-status" id="headlessStatus">Starting...</div>
     <div class="headless-call-info" id="headlessCallInfo">
@@ -107,6 +112,20 @@
     <div class="popup-buttons">
       <button class="btn-cancel" id="btnSettingsCancel">Cancel</button>
       <button class="btn-save" id="btnSettingsSave">Save</button>
+    </div>
+  </div>
+</div>
+<div class="popup-overlay" id="dionAccountPopup">
+  <div class="popup">
+    <h2>DION account</h2>
+    <label for="dionEmail">Email</label>
+    <input type="text" id="dionEmail" placeholder="you@example.com">
+    <label for="dionPassword">Password</label>
+    <input type="text" id="dionPassword" placeholder="">
+    <div class="clear-cookies-status" id="dionAccountStatus"></div>
+    <div class="popup-buttons">
+      <button class="btn-cancel" id="btnDionAccountCancel">Cancel</button>
+      <button class="btn-save" id="btnDionAccountSave">Save</button>
     </div>
   </div>
 </div>

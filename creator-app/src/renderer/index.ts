@@ -108,6 +108,41 @@ function bindSettingsEvents(): void {
   });
 }
 
+function bindDionAccountEvents(): void {
+  document.getElementById('btnDionAccount')!.addEventListener('click', openDionAccount);
+  document.getElementById('dionAccountPopup')!.addEventListener('click', closeDionAccount);
+  document.querySelector('#dionAccountPopup .popup')!.addEventListener('click', (event) => event.stopPropagation());
+  document.getElementById('btnDionAccountCancel')!.addEventListener('click', closeDionAccount);
+  document.getElementById('btnDionAccountSave')!.addEventListener('click', async () => {
+    const email = (document.getElementById('dionEmail') as HTMLInputElement).value.trim();
+    const password = (document.getElementById('dionPassword') as HTMLInputElement).value;
+    const status = document.getElementById('dionAccountStatus')!;
+    try {
+      await window.bridge.setDionCredentials(email, password);
+      closeDionAccount();
+    } catch {
+      status.textContent = 'Failed to save the credentials.';
+    }
+  });
+}
+
+async function openDionAccount(): Promise<void> {
+  const status = document.getElementById('dionAccountStatus')!;
+  status.textContent = '';
+  document.getElementById('dionAccountPopup')!.classList.add('visible');
+  try {
+    const credentials = await window.bridge.getDionCredentials();
+    (document.getElementById('dionEmail') as HTMLInputElement).value = credentials.email;
+    (document.getElementById('dionPassword') as HTMLInputElement).value = credentials.password;
+  } catch {
+    status.textContent = 'Failed to read the session file.';
+  }
+}
+
+function closeDionAccount(): void {
+  document.getElementById('dionAccountPopup')!.classList.remove('visible');
+}
+
 function bindErrorPopup(): void {
   document.getElementById('errorPopup')!.addEventListener('click', closeError);
   document.querySelector('#errorPopup .popup')!.addEventListener('click', (event) => event.stopPropagation());
@@ -189,6 +224,7 @@ function init(): void {
   bindToolbarEvents();
   bindActionBarEvents();
   bindSettingsEvents();
+  bindDionAccountEvents();
   bindErrorPopup();
   bindLogEvents();
   bindHeadlessEvents();

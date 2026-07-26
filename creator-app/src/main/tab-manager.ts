@@ -15,6 +15,7 @@ import {
   HeadlessStartArgs,
   HeadlessMode,
   UpstreamProxy,
+  DionCredentials,
 } from '../types';
 import {
   INITIAL_PORT_BASE,
@@ -36,6 +37,7 @@ import {
   LOG_CAPTURE_SNIPPET,
 } from '../constants';
 import { BotManager } from '../bot/bot-manager';
+import { DionCookieFile } from './dion-cookie-file';
 import { buildStoredZip } from './util/zip';
 import { resolveResourcePath, binaryName } from './util/paths';
 
@@ -336,9 +338,12 @@ export class TabManager {
       return;
     }
     tab.tunnelMode = config.tunnelMode;
-    let cookies = await this.getCookiesForDomains(config.cookieDomains);
+    const cookiesPath = this.cookieFilePath(platform);
     const refreshCookie = platform === Platform.WBStream ? 'wbx-refresh' : config.authCookie;
-    const needsLogin = !cookies.some((c) => c.name === refreshCookie);
+    const dionCookieFile = platform === Platform.Dion ? new DionCookieFile(cookiesPath) : null;
+    const fileHasSession = dionCookieFile != null && await dionCookieFile.hasSession();
+    let cookies = await this.getCookiesForDomains(config.cookieDomains);
+    const needsLogin = !fileHasSession && !cookies.some((c) => c.name === refreshCookie);
     if (needsLogin) {
       if (tab.isBot) {
         const reply = `Please log into ${config.platformName} in the creator app first, then try again.`;
@@ -367,9 +372,12 @@ export class TabManager {
       this.sendLog(tabId, `${config.platformName} login captured.`);
       cookies = await this.getCookiesForDomains(config.cookieDomains);
     }
-    this.sendLog(tabId, `${config.platformName} cookies (${cookies.length}): ${cookies.map((c) => c.name).join(', ')}`);
-    const cookiesPath = path.join(app.getPath('userData'), `cookies-${platform}.json`);
-    await fs.writeFile(cookiesPath, JSON.stringify(cookies));
+    if (fileHasSession) {
+      this.sendLog(tabId, `${config.platformName} session file is still active, keeping it as is.`);
+    } else {
+      this.sendLog(tabId, `${config.platformName} cookies (${cookies.length}): ${cookies.map((c) => c.name).join(', ')}`);
+      await fs.writeFile(cookiesPath, JSON.stringify(cookies));
+    }
     const spawnArgs = ['--resources', 'default', '--cookies', cookiesPath];
     this.killRelay(tabId, tab);
     if (joinTarget) {
@@ -383,7 +391,11 @@ export class TabManager {
     });
     tab.relay = proc;
     let sawAuthFailure = false;
+    let sawInvalidCredentials = false;
     this.attachProcessOutput(proc, tabId, (msg) => {
+      if (dionCookieFile && (msg.includes('"code":1086') || msg.includes('Invalid credentials'))) {
+        sawInvalidCredentials = true;
+      }
       if (
         msg.includes('status 401') ||
         msg.includes('"UnauthorizedError"') ||
@@ -395,7 +407,12 @@ export class TabManager {
     });
     proc.on('close', async (code) => {
       this.sendLog(tabId, `Headless exited with code ${code}`);
+      if (sawInvalidCredentials) {
+        this.sendLog(tabId, `${config.platformName} rejected the email and password stored in ${cookiesPath}, fix them or clear cookies to log in through the browser.`);
+        return;
+      }
       if (sawAuthFailure) {
+        if (dionCookieFile) await dionCookieFile.clearTokens();
         await this.clearAuthCookies(config.cookieDomains, config.authCookie);
         if (this.tabs.get(tabId) === tab) this.startHeadless(tabId, platform, args);
       }
@@ -417,6 +434,18 @@ export class TabManager {
     }
   }
 
+  private cookieFilePath(platform: Platform): string {
+    return path.join(app.getPath('userData'), `cookies-${platform}.json`);
+  }
+
+  async getDionCredentials(): Promise<DionCredentials> {
+    return new DionCookieFile(this.cookieFilePath(Platform.Dion)).readCredentials();
+  }
+
+  async setDionCredentials(email: string, password: string): Promise<void> {
+    await new DionCookieFile(this.cookieFilePath(Platform.Dion)).writeCredentials(email, password);
+  }
+
   async clearPlatformCookies(platform: Platform): Promise<number> {
     const config = this.headlessConfig(platform);
     if (!config) return 0;
@@ -434,7 +463,7 @@ export class TabManager {
         console.log(`[COOKIES] failed to remove ${cookie.name} on ${url}:`, err);
       }
     }
-    await fs.unlink(path.join(app.getPath('userData'), `cookies-${platform}.json`)).catch(() => {});
+    await fs.unlink(this.cookieFilePath(platform)).catch(() => {});
     console.log(`[COOKIES] cleared ${removed} cookies for ${platform}`);
     return removed;
   }
@@ -549,17 +578,18 @@ export class TabManager {
   }
 
   async buildCookiesZip(): Promise<Buffer> {
-    const platforms: { filename: string; domains: string[] }[] = [
-      { filename: 'cookies-vk.json', domains: VK_COOKIE_DOMAINS },
-      { filename: 'cookies-yandex.json', domains: YANDEX_COOKIE_DOMAINS },
-      { filename: 'cookies-dion.json', domains: DION_COOKIE_DOMAINS },
-      { filename: 'cookies-wbstream.json', domains: WBSTREAM_COOKIE_DOMAINS },
+    const platforms: { filename: string; domains: string[]; platform: Platform }[] = [
+      { filename: 'cookies-vk.json', domains: VK_COOKIE_DOMAINS, platform: Platform.VK },
+      { filename: 'cookies-yandex.json', domains: YANDEX_COOKIE_DOMAINS, platform: Platform.Telemost },
+      { filename: 'cookies-dion.json', domains: DION_COOKIE_DOMAINS, platform: Platform.Dion },
+      { filename: 'cookies-wbstream.json', domains: WBSTREAM_COOKIE_DOMAINS, platform: Platform.WBStream },
     ];
     const cookies = await Promise.all(platforms.map((p) => this.getCookiesForDomains(p.domains)));
-    const entries = platforms.map((p, i) => ({
-      name: p.filename,
-      data: Buffer.from(JSON.stringify(cookies[i], null, 2), 'utf8'),
-    }));
+    const dionContent = await new DionCookieFile(this.cookieFilePath(Platform.Dion)).readContent();
+    const entries = platforms.map((p, i) => {
+      const content = p.platform === Platform.Dion && dionContent ? dionContent : cookies[i];
+      return { name: p.filename, data: Buffer.from(JSON.stringify(content, null, 2), 'utf8') };
+    });
     return buildStoredZip(entries);
   }
 

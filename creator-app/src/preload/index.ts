@@ -32,6 +32,12 @@ import { IPC } from '../constants';
   clearCookies(platform: string) {
     return ipcRenderer.invoke(IPC.CLEAR_COOKIES, platform);
   },
+  getDionCredentials() {
+    return ipcRenderer.invoke(IPC.GET_DION_CREDENTIALS);
+  },
+  setDionCredentials(email: string, password: string) {
+    return ipcRenderer.invoke(IPC.SET_DION_CREDENTIALS, email, password);
+  },
   onCreateBotTab(cb: (data: any) => void) {
     ipcRenderer.on(IPC.CREATE_BOT_TAB, (_e, data) => cb(data));
   },

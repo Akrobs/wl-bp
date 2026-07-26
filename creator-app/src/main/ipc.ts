@@ -98,6 +98,14 @@ export function registerIpcHandlers(tabManager: TabManager): void {
     return tabManager.clearPlatformCookies(platform as Platform);
   });
 
+  ipcMain.handle(IPC.GET_DION_CREDENTIALS, () => {
+    return tabManager.getDionCredentials();
+  });
+
+  ipcMain.handle(IPC.SET_DION_CREDENTIALS, (_e, email: string, password: string) => {
+    return tabManager.setDionCredentials(email, password);
+  });
+
   ipcMain.handle(IPC.SEND_BOT_CALL_LINK, (_e, tabId: string, link: string) => {
     tabManager.sendBotCallLink(tabId, link);
   });
