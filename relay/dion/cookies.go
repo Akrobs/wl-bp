@@ -126,11 +126,21 @@ func (s *Session) SaveCookiesToFile(path string) error {
 	if err != nil {
 		return fmt.Errorf("marshal cookies: %w", err)
 	}
+	if atomicErr := writeFileAtomic(path, raw); atomicErr != nil {
+		if inPlaceErr := os.WriteFile(path, raw, 0o600); inPlaceErr != nil {
+			return fmt.Errorf("write cookies: %v, in-place fallback: %w", atomicErr, inPlaceErr)
+		}
+	}
+	return nil
+}
+
+func writeFileAtomic(path string, raw []byte) error {
 	tmp := path + ".tmp"
 	if err := os.WriteFile(tmp, raw, 0o600); err != nil {
 		return fmt.Errorf("write cookies tmp: %w", err)
 	}
 	if err := os.Rename(tmp, path); err != nil {
+		os.Remove(tmp)
 		return fmt.Errorf("rename cookies tmp: %w", err)
 	}
 	return nil

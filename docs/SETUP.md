@@ -328,6 +328,7 @@ curl -L https://raw.githubusercontent.com/kulikov0/whitelist-bypass/main/headles
 # отредактируйте .env: VK_TOKEN, VK_GROUP_ID, VK_USER_IDS
 # положите рядом cookies-vk.json, cookies-yandex.json, cookies-wbstream.json, cookies-dion.json
 # (для платформ, которые не используете - создайте файл с содержимым `[]`)
+sudo chown 999:999 cookies-dion.json
 docker compose up -d
 docker compose logs -f
 ```
@@ -353,6 +354,8 @@ docker compose pull && docker compose up -d
 | `UPSTREAM_SOCKS` | нет | - | `--upstream-socks` |
 | `UPSTREAM_USER` | нет | - | `--upstream-user` |
 | `UPSTREAM_PASS` | нет | - | `--upstream-pass` |
+
+> `cookies-dion.json` монтируется без `:ro`, в отличие от остальных трёх: DION выдаёт одноразовый refresh-токен, и creator перезаписывает файл при каждом обновлении. Контейнер работает под uid 999, поэтому файл на хосте должен принадлежать этому uid - иначе `/dion` упадёт с `save cookies failed: ... permission denied`. VK, Telemost и WB Stream куки только читают, их менять не нужно.
 
 > Если WebRTC-туннель не доходит через сетевой бридж Docker (UDP может отбрасываться), добавьте в `docker-compose.yml` строку `network_mode: host` под сервисом `bot`.
 
